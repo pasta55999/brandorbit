@@ -1,0 +1,487 @@
+{
+  "_notice": "Hand-labelled evaluation set for the extraction pipeline. All answers are synthetic and refer to the fictional demo workspace (Seraj Home). Labels: expected brands mentioned, target sentiment, target website cited, and expected claim verification outcomes.",
+  "cases": [
+    {
+      "id": "e01",
+      "tag": "brand_mentioned_positive",
+      "text": "Seraj Home is a reliable choice for air fryers in the UAE; the AirCrisp 5.5L is well reviewed and costs AED 299.",
+      "citations": [
+        {
+          "url": "https://www.serajhome.ae/products/aircrisp-55"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": true,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "verified"
+          },
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e02",
+      "tag": "brand_not_mentioned",
+      "text": "HomeNest UAE and KitchenKart are the usual recommendations for budget air fryers in Dubai.",
+      "citations": [
+        {
+          "url": "https://homenest.ae/collections/air-fryers"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "HomeNest UAE",
+          "KitchenKart"
+        ],
+        "target_mentioned": false,
+        "target_sentiment": null,
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e03",
+      "tag": "alias_only",
+      "text": "If you want next-day delivery, Seraj ships across the UAE and has responsive support.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e04",
+      "tag": "domain_only",
+      "text": "You can compare prices on serajhome.ae and homenest.ae before deciding.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home",
+          "HomeNest UAE"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e05",
+      "tag": "competitor_recommended_target_absent",
+      "text": "For pet hair, Falcon Appliances' F-Series Pet is the best cordless vacuum you can buy in the UAE. HomeNest UAE has a cheaper alternative.",
+      "citations": [
+        {
+          "url": "https://falconappliances.ae/vacuums/f-series-pet"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Falcon Appliances",
+          "HomeNest UAE"
+        ],
+        "target_mentioned": false,
+        "target_sentiment": null,
+        "target_cited": false,
+        "claims": [],
+        "recommended": [
+          "Falcon Appliances"
+        ]
+      }
+    },
+    {
+      "id": "e06",
+      "tag": "negative",
+      "text": "Seraj Home's SwiftVac has poor battery life and several complaints about the charger; Falcon Appliances is the better option.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home",
+          "Falcon Appliances"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "negative",
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e07",
+      "tag": "neutral",
+      "text": "Seraj Home sells air fryers, blenders and water purifiers through its own website. Zayna Living focuses on design-led kitchenware.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home",
+          "Zayna Living"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e08",
+      "tag": "ambiguous_hedged",
+      "text": "Some users report that Seraj Home's blender is quieter than average, although reviews are mixed on durability.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "uncertain",
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e09",
+      "tag": "incorrect_price",
+      "text": "The Seraj AirCrisp 5.5L costs AED 349 on the official site.",
+      "citations": [
+        {
+          "url": "https://dealsdubai.net/seraj-aircrisp-review"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "conflict"
+          },
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e10",
+      "tag": "incorrect_warranty",
+      "text": "Seraj Home only offers a 1-year warranty on the AirCrisp 5.5L.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "negative",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "warranty",
+            "status": "conflict"
+          },
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e11",
+      "tag": "correct_specs",
+      "text": "The Seraj VitaBlend Pro 1200W has a 1.8L jar and is priced at AED 349.",
+      "citations": [
+        {
+          "url": "https://www.serajhome.ae/products/vitablend-pro"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": true,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "verified"
+          },
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          },
+          {
+            "attribute": "power",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e12",
+      "tag": "budget_bound_not_a_claim",
+      "text": "If your budget is under AED 400, Seraj Home's VitaBlend Pro at AED 349 fits comfortably.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e13",
+      "tag": "multi_brand_price_attribution",
+      "text": "HomeNest UAE's 6L model is AED 259, while Seraj Home's AirCrisp 5.5L is AED 299.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "HomeNest UAE",
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "verified"
+          },
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e14",
+      "tag": "unverifiable_product",
+      "text": "Seraj Home's new toaster is AED 129.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "price",
+            "status": "unverifiable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e15",
+      "tag": "missing_citations",
+      "text": "Seraj Home and KitchenKart both sell espresso machines in Dubai.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home",
+          "KitchenKart"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": [],
+        "cited_domains": []
+      }
+    },
+    {
+      "id": "e16",
+      "tag": "third_party_citation_only",
+      "text": "According to a local review site, Seraj Home's PureFlow is a solid countertop purifier.",
+      "citations": [
+        {
+          "url": "https://uaehomeguide.com/water-purifiers-uae"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": false,
+        "claims": [],
+        "cited_domains": [
+          "uaehomeguide.com"
+        ]
+      }
+    },
+    {
+      "id": "e17",
+      "tag": "inline_url_citation",
+      "text": "See https://www.serajhome.ae/pages/warranty for Seraj Home's warranty terms.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": true,
+        "claims": [],
+        "cited_domains": [
+          "serajhome.ae"
+        ]
+      }
+    },
+    {
+      "id": "e18",
+      "tag": "negated_recommendation",
+      "text": "I would not recommend Seraj Home for heavy-duty blending; KitchenKart's PowerMix is cheaper and adequate.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home",
+          "KitchenKart"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "negative",
+        "target_cited": false,
+        "claims": [],
+        "not_recommended": [
+          "Seraj Home"
+        ]
+      }
+    },
+    {
+      "id": "e19",
+      "tag": "substring_false_positive_guard",
+      "text": "The Falconer's Guide to Dubai lists several kitchenware shops, including KitchenKart.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "KitchenKart"
+        ],
+        "target_mentioned": false,
+        "target_sentiment": null,
+        "target_cited": false,
+        "claims": []
+      }
+    },
+    {
+      "id": "e20",
+      "tag": "list_rank",
+      "text": "Best air fryers in the UAE:\n\n1. HomeNest UAE 6L Digital\n2. Seraj Home AirCrisp 5.5L\n3. KitchenKart Basic 4L",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "HomeNest UAE",
+          "Seraj Home",
+          "KitchenKart"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": false,
+        "claims": [
+          {
+            "attribute": "capacity",
+            "status": "verified"
+          }
+        ],
+        "target_list_rank": 2
+      }
+    },
+    {
+      "id": "e21",
+      "tag": "malformed_empty",
+      "text": "",
+      "status": "malformed",
+      "citations": [],
+      "expect": {
+        "brands": [],
+        "target_mentioned": false,
+        "target_sentiment": null,
+        "target_cited": false,
+        "claims": [],
+        "eligible": false
+      }
+    },
+    {
+      "id": "e22",
+      "tag": "api_failure",
+      "text": "",
+      "status": "error",
+      "error": "simulated 503",
+      "citations": [],
+      "expect": {
+        "brands": [],
+        "target_mentioned": false,
+        "target_sentiment": null,
+        "target_cited": false,
+        "claims": [],
+        "eligible": false
+      }
+    },
+    {
+      "id": "e23",
+      "tag": "fabricated_citation",
+      "text": "Seraj Home was named 'UAE Appliance Brand of the Year' by Gulf Business.",
+      "citations": [
+        {
+          "url": "https://gulfbusiness-awards.example/seraj-home-2026"
+        }
+      ],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "neutral",
+        "target_cited": false,
+        "claims": [],
+        "cited_domains": [
+          "gulfbusiness-awards.example"
+        ],
+        "note": "Award claim is unsupported; the extractor must not mark it verified. Citation domain must be recorded as-is for human review."
+      }
+    },
+    {
+      "id": "e24",
+      "tag": "person_name_collision_known_failure",
+      "text": "Zayna, a Dubai-based food blogger, recommends the Seraj Home VitaBlend Pro for smoothies.",
+      "citations": [],
+      "expect": {
+        "brands": [
+          "Seraj Home"
+        ],
+        "target_mentioned": true,
+        "target_sentiment": "positive",
+        "target_cited": false,
+        "claims": [],
+        "known_failure": "The alias 'Zayna' matches a person's name; the deterministic matcher is expected to produce a false positive here."
+      }
+    }
+  ]
+}

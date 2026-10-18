@@ -1,0 +1,24 @@
+{
+  "_notice": "DEMO FIXTURE. Seraj Home and every competitor, product, reviewer site and URL in this workspace are fictional and were authored for the BrandOrbit portfolio project. Nothing here is a real AI search result.",
+  "id": "ws_demo_seraj",
+  "name": "Seraj Home (demo workspace)",
+  "is_demo": true,
+  "brand": {
+    "name": "Seraj Home",
+    "website": "https://www.serajhome.ae",
+    "industry": "Home & kitchen appliances (e-commerce)",
+    "categories": ["Air fryers", "Blenders", "Cordless vacuums", "Water purifiers", "Coffee machines"],
+    "country": "United Arab Emirates",
+    "country_code": "AE",
+    "currency": "AED",
+    "language": "en",
+    "aliases": ["Seraj", "SerajHome"],
+    "description": "Fictional Dubai-based direct-to-consumer brand selling mid-range kitchen and home appliances with a 2-year warranty and next-day delivery across the UAE."
+  },
+  "competitors": [
+    {"name": "HomeNest UAE", "website": "https://homenest.ae", "aliases": ["HomeNest"]},
+    {"name": "KitchenKart", "website": "https://kitchenkart.ae", "aliases": ["Kitchen Kart"]},
+    {"name": "Zayna Living", "website": "https://zaynaliving.com", "aliases": ["Zayna"]},
+    {"name": "Falcon Appliances", "website": "https://falconappliances.ae", "aliases": ["Falcon"]}
+  ]
+}

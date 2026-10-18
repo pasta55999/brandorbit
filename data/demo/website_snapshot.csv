@@ -1,0 +1,12 @@
+sku,page_url,listed_price,currency,has_product_schema,has_price_in_schema,has_description,title_tag,snapshot_note
+SH-AF-55,https://www.serajhome.ae/products/aircrisp-55,299,AED,true,true,true,Seraj AirCrisp 5.5L Air Fryer | Seraj Home,DEMO FIXTURE - simulated crawl of a fictional site
+SH-AF-80,https://www.serajhome.ae/products/aircrisp-xl-8l,499,AED,true,false,true,AirCrisp XL Dual Zone | Seraj Home,DEMO FIXTURE - price differs from catalogue (499 vs 479)
+SH-BL-12,https://www.serajhome.ae/products/vitablend-pro,349,AED,true,true,true,VitaBlend Pro 1200W Blender | Seraj Home,DEMO FIXTURE
+SH-BL-06,https://www.serajhome.ae/products/vitablend-mini,149,AED,false,false,false,VitaBlend Mini,DEMO FIXTURE - no structured data and no description
+SH-VC-20,https://www.serajhome.ae/products/swiftvac-cordless,699,AED,true,true,true,SwiftVac Cordless Stick Vacuum | Seraj Home,DEMO FIXTURE
+SH-VC-21,https://www.serajhome.ae/products/swiftvac-pet,799,AED,true,true,true,SwiftVac Pet Edition | Seraj Home,DEMO FIXTURE
+SH-WP-10,https://www.serajhome.ae/products/pureflow-countertop,949,AED,true,true,true,PureFlow Countertop RO Purifier | Seraj Home,DEMO FIXTURE - price differs from catalogue (949 vs 899)
+SH-WP-11,https://www.serajhome.ae/products/pureflow-undersink,1299,AED,false,false,true,PureFlow Under-Sink RO | Seraj Home,DEMO FIXTURE - no structured data
+SH-CM-30,https://www.serajhome.ae/products/brewmaster-espresso,549,AED,true,true,true,BrewMaster Espresso 15 Bar | Seraj Home,DEMO FIXTURE
+SH-CM-31,https://www.serajhome.ae/products/brewmaster-pod,249,AED,true,true,true,Brewmaster Pod Compact | Seraj Home,DEMO FIXTURE
+SH-KT-40,https://www.serajhome.ae/products/rapidboil-kettle,99,AED,true,true,true,RapidBoil Glass Kettle | Seraj Home,DEMO FIXTURE

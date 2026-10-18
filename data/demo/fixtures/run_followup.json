@@ -1,0 +1,60 @@
+{
+  "_notice": "DEMO FIXTURE. Simulated follow-up run for the before/after comparison. Entries marked same_as_baseline reuse the baseline answer verbatim to simulate stable answers. Changed answers were authored to illustrate gains, regressions, a provider timeout and a malformed response. None of this is a real AI output.",
+  "run": {
+    "id": "run_demo_followup",
+    "label": "Demo follow-up (simulated, 2026-10-12)",
+    "started_at": "2026-10-12T08:00:00+00:00",
+    "finished_at": "2026-10-12T08:07:10+00:00",
+    "notes": "Fixture run simulating a re-check four weeks after the baseline. Simulated changes: price corrected on the demo site, a 'quiet blender' FAQ page added, warranty page clarified."
+  },
+  "implemented_between_runs": ["F-ACC-001", "F-ACC-003", "F-GAP-002", "F-CAT-001"],
+  "responses": [
+    {"prompt_id": "p01", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p01", "provider": "demo-beta", "latency_ms": 1350, "text": "Popular air fryer brands in the UAE include HomeNest UAE, Falcon Appliances, Seraj Home and Zayna Living. HomeNest is known for affordable digital models, Falcon Appliances for larger dual-basket units, Seraj Home for its well-priced AirCrisp range with a 2-year warranty, and Zayna Living for design-led kitchen products. Consider capacity (4-6L suits most households), wattage and whether the basket is dishwasher safe.", "citations": []},
+
+    {"prompt_id": "p02", "provider": "demo-alpha", "latency_ms": 2010, "text": "For reliable kitchen appliances with fast delivery in Dubai, consider:\n\n- **HomeNest UAE** - large catalogue, usually 1-2 day delivery in Dubai.\n- **KitchenKart** - competitive prices, same-day delivery in some areas.\n- **Falcon Appliances** - premium range with scheduled delivery slots.\n\nAll three list prices in AED and offer cash on delivery.", "citations": [{"url": "https://uaehomeguide.com/where-to-buy-kitchen-appliances-dubai", "title": "Where to buy kitchen appliances in Dubai"}, {"url": "https://homenest.ae", "title": "HomeNest UAE"}]},
+    {"prompt_id": "p02", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p03", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p03", "provider": "demo-beta", "latency_ms": 1260, "text": "Good cordless vacuum options for apartments in the UAE include Falcon Appliances, Zayna Living and Seraj Home. Falcon Appliances offers strong suction and long runtime, Zayna Living focuses on compact, stylish units, and Seraj Home's SwiftVac is a lightweight 2.6 kg stick vacuum with HEPA filtration that suits small apartments. Prioritise weight under 3 kg, at least 40 minutes of runtime and washable filters.", "citations": []},
+
+    {"prompt_id": "p04", "provider": "demo-alpha", "latency_ms": 2200, "text": "Countertop water purifier brands worth considering in the UAE:\n\n1. **Zayna Living** - compact RO units with mineral cartridges.\n2. **Seraj Home** - the PureFlow Countertop is a 5-stage RO system that needs no plumbing and is priced at AED 899.\n3. **Falcon Appliances** - larger tank capacity, better for families.\n\nFor tap water in Dubai, a reverse-osmosis countertop model is generally sufficient.", "citations": [{"url": "https://uaehomeguide.com/water-purifiers-uae", "title": "Water purifiers in the UAE: a guide"}, {"url": "https://www.serajhome.ae/products/pureflow-countertop", "title": "PureFlow Countertop"}]},
+    {"prompt_id": "p04", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p05", "provider": "demo-alpha", "latency_ms": 2380, "text": "**Seraj Home vs HomeNest UAE for air fryers**\n\nSeraj Home's flagship AirCrisp 5.5L costs AED 299 and comes with a 2-year warranty. It has 8 presets and a dishwasher-safe basket. HomeNest UAE's comparable 6L model is slightly cheaper during sales and HomeNest offers a wider range of sizes.\n\nVerdict: HomeNest UAE is the better pick if you want choice; Seraj Home is a solid option if you prefer a direct-to-consumer brand with a longer standard warranty.", "citations": [{"url": "https://www.serajhome.ae/products/aircrisp-55", "title": "Seraj AirCrisp 5.5L"}, {"url": "https://homenest.ae/collections/air-fryers", "title": "Air fryers - HomeNest UAE"}]},
+    {"prompt_id": "p05", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p06", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p06", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p07", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p07", "provider": "demo-beta", "status": "malformed", "latency_ms": 940, "text": "", "error": "Provider returned an empty message body (simulated malformed response)", "citations": []},
+
+    {"prompt_id": "p08", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p08", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p09", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p09", "provider": "demo-beta", "latency_ms": 1220, "text": "Zayna Living, Seraj Home and KitchenKart all have blenders under AED 400 that handle smoothies well. Zayna Living's entry model is around AED 390 with a glass jar, Seraj Home's VitaBlend Pro is AED 349 with a 1200W motor, and KitchenKart's PowerMix is cheaper at roughly AED 280. For frozen fruit, choose a motor of at least 1000W.", "citations": []},
+
+    {"prompt_id": "p10", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p10", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p11", "provider": "demo-alpha", "latency_ms": 2120, "text": "For a quiet blender in a small Dubai apartment, **Zayna Living** is the usual recommendation: their blenders use a sound-dampening enclosure and run noticeably quieter than budget models. **Seraj Home**'s VitaBlend Pro now ships with a removable quiet shield and is cheaper at AED 349, which makes it a reasonable alternative. **KitchenKart** also lists a 'low-noise' model, though reviews are mixed.", "citations": [{"url": "https://zaynaliving.com/collections/blenders", "title": "Blenders - Zayna Living"}, {"url": "https://www.serajhome.ae/pages/quiet-blender-faq", "title": "Quiet blender FAQ - Seraj Home"}]},
+    {"prompt_id": "p11", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p12", "provider": "demo-alpha", "status": "timeout", "latency_ms": 45000, "text": "", "error": "Request timed out after 45s (simulated provider timeout)", "citations": []},
+    {"prompt_id": "p12", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p13", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p13", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p14", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p14", "provider": "demo-beta", "latency_ms": 1310, "text": "You can buy the Seraj AirCrisp air fryer from Seraj Home's online store. The 5.5L model is listed at AED 299 on the official site, with next-day delivery across the UAE and a 2-year warranty.", "citations": [{"url": "https://www.serajhome.ae/products/aircrisp-55", "title": "Seraj AirCrisp 5.5L"}]},
+
+    {"prompt_id": "p15", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p15", "provider": "demo-beta", "same_as_baseline": true},
+
+    {"prompt_id": "p16", "provider": "demo-alpha", "same_as_baseline": true},
+    {"prompt_id": "p16", "provider": "demo-beta", "latency_ms": 1230, "text": "HomeNest UAE, Falcon Appliances and Seraj Home all offer 2-year warranties on many kitchen appliances. Seraj Home applies the 2-year warranty across its whole range, HomeNest UAE on selected ranges, and Falcon Appliances up to 3 years on premium lines. Zayna Living's warranty varies by product.", "citations": []}
+  ]
+}
