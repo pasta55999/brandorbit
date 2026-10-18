@@ -99,9 +99,11 @@ e11), inline-URL misses (e17), and the absence of sentiment/claim extraction.
 * **Before/after comparison** - the fixture pair yields exactly the designed 4 gained / 1 lost
   mentions and 2 coverage mismatches (one timeout, one malformed answer).
 * **UI** - every page is rendered headlessly with Streamlit `AppTest` against a temporary
-  database (`tests/test_ui_smoke.py`).
+  database; the Overview is checked to show the stored run's figures (63.3%, 19/30) and to switch
+  to the baseline figures when the run selector changes; a recommendation status change is
+  checked to persist (`tests/test_ui_smoke.py`).
 
-Run everything with `pytest` (50 tests at the time of writing).
+Run everything with `pytest` (51 tests at the time of writing).
 
 ## 6. Limitations of this evaluation
 

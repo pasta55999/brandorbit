@@ -52,17 +52,26 @@ currency, language, brand details and competitors are configurable.
 | **Onboarding** | Brand name/website, industry, categories, country & currency, competitors, CSV product catalogue (validated: columns, size, duplicates), prompt set. Default demo workspace needs no configuration. |
 | **Prompt set** | Manual prompts; template or LLM-generated suggestions in five categories (discovery, comparison, product-specific, problem-solving, purchase intent); suggestions must be reviewed and approved before monitoring; prompts persist across runs. |
 | **Monitoring** | Provider abstraction with a fixture provider (demo), OpenAI Responses API + web search, and Anthropic Messages API + web search. Per response: prompt, category, provider, model, immutable raw text, citations, status, latency, tokens, `source_kind`. Timeouts, bounded retries, per-run limits, partial-run handling. |
-| **Overview** | Prompts monitored, brand mention rate, website citation rate, competitor share of voice, potentially inaccurate claims, change vs previous run, absent prompts. |
-| **Visibility** | Mention rates by provider and category (brand vs each competitor), head-to-head table, absent prompts, competitor gaps, multi-run trend. |
-| **Competitors** | Mention rate, citation rate, share of voice, recommended/first-mentioned counts, share of voice by category, gap prompts, metric definitions. |
-| **Perception** | Sentiment distribution (positive/neutral/negative/uncertain), associated attributes, strengths and hedged/negative quotes, every product claim with claimed vs catalogue value and verification status. |
-| **Citations** | Cited domains and URLs, owner type (brand / competitor / third party), sources associated with brand mentions vs competitor recommendations, pages worth investigating. |
-| **Prompt explorer** | Search/filter prompts, last-run date, side-by-side raw answers from different providers, extracted mentions, claims, citations, extractor notes. |
-| **Recommendations** | Rule-generated findings with ID, category, severity, confidence, verification status, evidence (prompt/response IDs + verbatim quotes + source URL), explanation, proposed action, expected outcome as a hypothesis, limitations; set status (open/planned/completed/dismissed); re-run related prompts; optional LLM narration under schema validation. |
-| **Product-data audit** | Deterministic checks for missing attributes, descriptions, prices, URLs, inconsistent names/specs, cross-source price mismatches, weak differentiators; website structured-data checks from a snapshot or opt-in live inspection (robots.txt-aware, max 5 pages); Markdown report and JSON export. |
-| **Before & after** | Save a baseline, compare with a later run on common prompts: metric deltas with sample sizes, gained/lost mentions, competitor presence, cited-source changes, wording diffs, implemented recommendations, explicit causation disclaimer. |
+| **Overview** | Four KPIs (mention rate, website cited, share of voice, inaccurate claims) with change vs the previous run and sample sizes, visibility trend, brand-vs-competitor bar, one evidence-backed priority insight, top three actions. |
+| **AI Visibility** | Trend by provider, breakdown by provider (brand vs competitors) and by prompt intent, prompts where the brand is missing, methodology in an expander. |
+| **Competitors** | Comparison table (mention rate, website cited, share of voice, recommended, named first), share of voice by intent, where you lose (gap prompts per competitor) with prompt-level evidence quotes. |
+| **Brand Perception** | Sentiment distribution, themes, potential factual inaccuracies each linked to the exact stored answer, strengths and concerns quotes, all claims in an expander. |
+| **Sources & Citations** | Cited domains by owner type (yours / competitor / third party), sources supporting competitors, prompts where the brand is mentioned without your site being cited, all URLs. |
+| **Recommendations** | *Actions*: findings with severity, confidence, verification status, status control (open/planned/completed/dismissed), progressive-disclosure details with verbatim evidence, re-run related prompts, optional schema-validated LLM narration. *Product data*: catalogue and website audit grouped by severity and type, Markdown report and JSON export. |
+| **Monitoring** | *Runs*: history table, failed-call details, new-run dialog, baseline selection. *Before & after*: metric deltas on common prompts, gained/lost mentions, competitor presence, cited sources, wording diffs, completed recommendations, causation disclaimer. *Prompt explorer*: raw immutable answers side by side per provider with extracted analysis visually separated. |
+| **Settings** | Brand & competitors, product catalogue, prompt management and approval, providers & mode (demo/live explanation, limits, call log), data retention and export. |
 
-Screenshots are not included in the repository; run the app locally (two commands below) to see the dashboard.
+### Screenshots
+
+| Overview | Recommendations |
+|---|---|
+| ![Overview](docs/screenshots/overview.png) | ![Recommendations](docs/screenshots/recommendations.png) |
+
+| Competitors | Brand Perception |
+|---|---|
+| ![Competitors](docs/screenshots/competitors.png) | ![Perception](docs/screenshots/perception.png) |
+
+More in `docs/screenshots/` (AI Visibility, Sources & Citations, Monitoring, Settings). Captured from the demo workspace with `python -m evaluation.screenshots`.
 
 ## Quick start
 
@@ -83,7 +92,7 @@ baseline) is created automatically on first start.
 Run the tests and the evaluation harness:
 
 ```bash
-pytest                          # 50 tests incl. headless rendering of every page
+pytest                          # 51 tests incl. headless rendering of every page
 python -m evaluation.run_eval   # extraction evaluation on the labelled set (add --llm with a key)
 ```
 
@@ -93,7 +102,7 @@ python -m evaluation.run_eval   # extraction evaluation on the labelled set (add
 |---|---|---|
 | Requirement | none | `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` in `.env` |
 | Answers | hand-written fixtures for the 16 demo prompts, `source_kind=demo_fixture`, `demo-alpha` / `demo-beta` providers | real API responses with citations where the provider returns them |
-| Labelling | banner on every page, "DEMO MODE" badge, "DEMO FIXTURE" tag on each answer | "LIVE" badge |
+| Labelling | sidebar "Demo mode" control with an explanation, "Demo fixture" tag on each answer, demo column in run history | "Live" chip |
 | New prompts | demo providers return a labelled **error** (they never invent answers) | monitored normally |
 | LLM features | prompt suggestions fall back to templates; LLM extraction/narration disabled | enabled |
 
@@ -128,7 +137,7 @@ Streamlit UI (brandorbit/ui)  ->  core/metrics, analysis/*, audits/*  ->  storag
 * `brandorbit/analysis` - deterministic extraction, optional LLM extraction/suggestions, rule-based findings with optional LLM narration, before/after comparison.
 * `brandorbit/audits` - catalogue audit, website snapshot/live inspection, Markdown report.
 * `brandorbit/storage` - SQLite repository (JSON documents + indexed columns).
-* `brandorbit/ui` - one module per page; `streamlit_app.py` wires navigation.
+* `brandorbit/ui` - `theme.py` (palette, CSS, Altair theme), `common.py` (reusable components: KPI cards, sections, charts, evidence quotes), one module per page; `streamlit_app.py` wires navigation.
 * `data/demo` - fictional workspace, catalogue, website snapshot, prompts, two fixture runs. `data/eval` - labelled evaluation set.
 * `tests`, `evaluation`, `docs` (ARCHITECTURE, METRICS, DECISIONS), `EVALUATION.md`.
 
