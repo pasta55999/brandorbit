@@ -1,0 +1,21 @@
+{
+  "_notice": "DEMO FIXTURE prompt set for the fictional brand Seraj Home.",
+  "prompts": [
+    {"id": "p01", "category": "discovery", "text": "What are the best air fryer brands available in the UAE?"},
+    {"id": "p02", "category": "discovery", "text": "Which online stores in Dubai sell reliable kitchen appliances with fast delivery?"},
+    {"id": "p03", "category": "discovery", "text": "What are the best cordless vacuum brands for apartments in the UAE?"},
+    {"id": "p04", "category": "discovery", "text": "Recommend good countertop water purifier brands in the UAE."},
+    {"id": "p05", "category": "comparison", "text": "Seraj Home vs HomeNest UAE for air fryers - which is better?"},
+    {"id": "p06", "category": "comparison", "text": "KitchenKart vs Zayna Living for blenders in Dubai?"},
+    {"id": "p07", "category": "comparison", "text": "Compare the SwiftVac cordless vacuum with Falcon Appliances cordless vacuums."},
+    {"id": "p08", "category": "product_specific", "text": "Best air fryer under AED 300 in the UAE?"},
+    {"id": "p09", "category": "product_specific", "text": "Best blender under AED 400 for smoothies in Dubai?"},
+    {"id": "p10", "category": "product_specific", "text": "What is a good espresso machine under AED 600 in the UAE?"},
+    {"id": "p11", "category": "problem_solving", "text": "What should I buy if I need a quiet blender for a small apartment in Dubai?"},
+    {"id": "p12", "category": "problem_solving", "text": "I have a cat that sheds a lot. Which cordless vacuum should I buy in the UAE?"},
+    {"id": "p13", "category": "problem_solving", "text": "Which water purifier is best for a rented apartment in Abu Dhabi where I cannot modify plumbing?"},
+    {"id": "p14", "category": "purchase_intent", "text": "Where can I buy a Seraj AirCrisp air fryer in the UAE and what does it cost?"},
+    {"id": "p15", "category": "purchase_intent", "text": "Where can I find a reliable cordless vacuum with a good warranty in Dubai?"},
+    {"id": "p16", "category": "purchase_intent", "text": "Which UAE appliance brands offer a 2-year warranty on kitchen appliances?"}
+  ]
+}

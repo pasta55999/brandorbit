@@ -1,0 +1,26 @@
+[project]
+name = "brandorbit"
+version = "0.1.0"
+description = "AI search visibility & brand intelligence platform (portfolio prototype)"
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+  "streamlit>=1.38,<2",
+  "pydantic>=2.7,<3",
+  "pandas>=2.2,<3",
+  "altair>=5,<6",
+  "httpx>=0.27,<1",
+  "python-dotenv>=1.0,<2",
+  "openai>=1.50,<2",
+  "anthropic>=0.40,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.setuptools.packages.find]
+include = ["brandorbit*"]

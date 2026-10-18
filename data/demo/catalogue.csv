@@ -1,0 +1,13 @@
+sku,name,category,price,currency,description,url,capacity,power_w,warranty_years,weight_kg,noise_db
+SH-AF-55,Seraj AirCrisp 5.5L Air Fryer,Air fryers,299,AED,"Digital 5.5-litre air fryer with 8 presets, dishwasher-safe basket and 2-year warranty. Rapid-air system cooks with up to 85% less oil.",https://www.serajhome.ae/products/aircrisp-55,5.5 L,1500,2,4.8,
+SH-AF-80,Seraj AirCrisp XL 8L Dual Zone,Air fryers,479,AED,"Dual-basket 8-litre air fryer with sync-finish mode for family meals.",https://www.serajhome.ae/products/aircrisp-xl-8l,8 L,2400,2,7.2,
+SH-BL-12,Seraj VitaBlend Pro 1200W,Blenders,349,AED,"High-speed blender with 1.8L tritan jar, 6 stainless blades and ice-crush programme. Quiet shield included.",https://www.serajhome.ae/products/vitablend-pro,1.8 L,1200,2,3.9,
+SH-BL-06,Seraj VitaBlend Mini,Blenders,149,AED,,https://www.serajhome.ae/products/vitablend-mini,0.6 L,,2,1.1,
+SH-VC-20,Seraj SwiftVac Cordless Stick Vacuum,Cordless vacuums,699,AED,"Cordless stick vacuum with 45-minute runtime, HEPA filtration and detachable handheld unit.",https://www.serajhome.ae/products/swiftvac-cordless,0.6 L,,2,2.6,72
+SH-VC-21,Seraj SwiftVac Pet Edition,Cordless vacuums,799,AED,"SwiftVac with motorised pet brush and tangle-free roller.",https://www.serajhome.ae/products/swiftvac-pet,0.6 L,,2,2.7,
+SH-WP-10,Seraj PureFlow Countertop Water Purifier,Water purifiers,899,AED,"5-stage reverse osmosis countertop purifier, no plumbing required. Filters rated for 6 months.",https://www.serajhome.ae/products/pureflow-countertop,4 L,,2,6.5,
+SH-WP-11,Seraj PureFlow Under-Sink RO,Water purifiers,1299,AED,"Under-sink 6-stage RO system with mineralisation and leak sensor.",https://www.serajhome.ae/products/pureflow-undersink,,,2,9.0,
+SH-CM-30,Seraj BrewMaster Espresso 15 Bar,Coffee machines,549,AED,"15-bar pump espresso machine with steam wand and 1.5L tank.",https://www.serajhome.ae/products/brewmaster-espresso,1.5 L,1350,2,4.2,
+SH-CM-31,Seraj Brewmaster Pod Compact,Coffee machines,249,AED,"Compact capsule machine compatible with standard pods.",https://www.serajhome.ae/products/brewmaster-pod,0.8 L,1200,2,2.4,
+SH-KT-40,Seraj RapidBoil Glass Kettle 1.7L,Kitchen essentials,99,AED,"Borosilicate glass kettle with blue LED and auto shut-off.",https://www.serajhome.ae/products/rapidboil-kettle,1.7 L,2200,2,1.2,
+SH-KT-41,Seraj RapidBoil Glass Kettle 1.7L,Kitchen essentials,109,AED,"Glass kettle, 1.7 litres, keep-warm function.",https://www.serajhome.ae/products/rapidboil-kettle-v2,1.7 L,2200,1,1.3,
