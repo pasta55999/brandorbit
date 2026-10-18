@@ -7,79 +7,76 @@ import streamlit as st
 
 from brandorbit.analysis.extraction import extract_citations
 from brandorbit.core.metrics import join_records
-from brandorbit.ui.common import bar_chart, coverage_caption, demo_banner, get_repo, page_header, run_metrics, select_run, select_workspace, short_pid
+from brandorbit.core.schemas import domain_of
+from brandorbit.ui.common import coverage_line, df_table, empty_state, get_repo, guard_run, hbar, kpi, metric_kpi, page_header, run_metrics, section, select_workspace, short_pid
 
 
 def render() -> None:
     repo = get_repo()
     ws = select_workspace(repo)
-    run = select_run(repo, ws)
-    page_header("Citation intelligence", "Which sources AI answers cite, and which ones appear alongside brand or competitor mentions.")
-    demo_banner(ws, run)
-    if run is None:
-        st.info("No runs yet.")
+    run = page_header("Sources & Citations", "Which pages AI answers lean on - yours, competitors', or third parties'.", repo=repo, ws=ws, with_run=True)
+    if not guard_run(repo, ws, run):
         return
     m = run_metrics(repo, ws, run)
-    coverage_caption(m)
     prompts = repo.list_prompts(ws.id)
     records, _ = join_records(prompts, repo.list_responses(run.id), repo.list_extractions(run.id))
     comps = {c.name for c in ws.competitors}
     comp_domains = {c.domain: c.name for c in ws.competitors}
 
-    domain_rows = defaultdict(lambda: {"answers": 0, "with brand mention": 0, "with competitor mention": 0, "urls": set(), "prompts": set()})
-    url_rows = Counter()
-    url_title = {}
+    def owner(domain: str) -> str:
+        if domain == ws.brand.domain:
+            return "Your site"
+        return f"Competitor - {comp_domains[domain]}" if domain in comp_domains else "Third party"
+
+    dom = defaultdict(lambda: {"answers": 0, "with brand": 0, "with competitor": 0, "urls": Counter(), "titles": {}})
     no_cite = 0
     for r in records:
         cits = extract_citations(r.response)
         if not cits:
             no_cite += 1
-        for c in {c.domain: c for c in cits}.values():
-            d = domain_rows[c.domain]
-            d["answers"] += 1
-            d["with brand mention"] += int(r.extraction.target_mentioned)
-            d["with competitor mention"] += int(bool(r.brands_mentioned & comps))
-            d["prompts"].add(short_pid(r.prompt.id))
+        for d in {c.domain for c in cits if c.domain}:
+            dom[d]["answers"] += 1
+            dom[d]["with brand"] += int(r.extraction.target_mentioned)
+            dom[d]["with competitor"] += int(bool(r.brands_mentioned & comps))
         for c in cits:
-            url_rows[c.url] += 1
-            url_title[c.url] = c.title
-            domain_rows[c.domain]["urls"].add(c.url)
-
-    def owner(domain: str) -> str:
-        if domain == ws.brand.domain:
-            return "brand site"
-        if domain in comp_domains:
-            return f"competitor ({comp_domains[domain]})"
-        return "third party"
+            dom[c.domain]["urls"][c.url] += 1
+            dom[c.domain]["titles"][c.url] = c.title
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Answers with any citation", f"{len(records) - no_cite}/{len(records)}")
-    c2.metric("Distinct domains cited", len(domain_rows))
-    c3.metric("Brand website citation rate", m.citation_rate.display, help=m.citation_rate.definition + f" (n = {m.citation_rate.sample})")
-    if no_cite:
-        st.caption(f"{no_cite} eligible answers returned no citations (typically providers without web search). They count in denominators.")
-
-    st.markdown("#### Cited domains")
-    df = pd.DataFrame([{"domain": d, "type": owner(d), **{k: v for k, v in row.items() if k not in ("urls", "prompts")}, "distinct URLs": len(row["urls"]), "prompts": ", ".join(sorted(row["prompts"]))}
-                       for d, row in domain_rows.items()]).sort_values("answers", ascending=False) if domain_rows else pd.DataFrame()
-    if df.empty:
-        st.info("No citations in this run.")
-        return
-    st.dataframe(df, use_container_width=True, hide_index=True)
-
-    c1, c2 = st.columns(2)
     with c1:
-        st.markdown("#### Sources associated with brand mentions")
-        sub = df[df["with brand mention"] > 0][["domain", "with brand mention"]].rename(columns={"with brand mention": "answers with brand"})
-        bar_chart(sub, "domain", "answers with brand", pct=False, height=240)
+        kpi("Answers with citations", f"{len(records) - no_cite}/{len(records)}", help_text="Eligible answers that returned at least one source. Providers without web search return none.")
     with c2:
-        st.markdown("#### Sources when competitors are recommended")
-        sub = df[df["with competitor mention"] > 0][["domain", "with competitor mention"]].rename(columns={"with competitor mention": "answers with competitor"})
-        bar_chart(sub, "domain", "answers with competitor", pct=False, height=240)
+        metric_kpi("Your site cited", m.citation_rate, help_text="Eligible answers citing the brand's domain.")
+    with c3:
+        kpi("Distinct domains", str(len(dom)), help_text="Unique domains across provider citations and inline URLs.")
+    st.write("")
+    coverage_line(m)
+    if not dom:
+        empty_state("No citations in this run", "The selected providers did not return sources.")
+        return
 
-    st.markdown("#### Pages worth investigating")
-    st.caption("Third-party URLs cited most often in answers that mention the brand or a competitor. Review what they say; outdated pages are a common source of inaccurate claims.")
-    rows = [{"url": u, "title": url_title.get(u, ""), "cited in answers": n, "type": owner(u.split("/")[2].replace("www.", ""))} for u, n in url_rows.most_common(25)]
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, column_config={"url": st.column_config.LinkColumn()})
-    if ws.is_demo:
-        st.caption("Demo note: every domain and URL above is fictional and does not resolve.")
+    df = pd.DataFrame([{"domain": d, "type": owner(d), "answers": v["answers"], "with brand": v["with brand"], "with competitor": v["with competitor"], "urls": len(v["urls"])} for d, v in dom.items()]).sort_values("answers", ascending=False)
+    left, right = st.columns([3, 2])
+    with left:
+        section("Cited domains")
+        df_table(df, column_config={"answers": st.column_config.NumberColumn("Answers"), "with brand": st.column_config.NumberColumn("w/ brand mention"), "with competitor": st.column_config.NumberColumn("w/ competitor"), "urls": st.column_config.NumberColumn("URLs")})
+    with right:
+        section("Sources supporting competitors")
+        sub = df[(df["with competitor"] > 0) & (df["type"] != "Your site")].head(8)
+        hbar(sub[["domain", "with competitor"]].rename(columns={"with competitor": "answers"}), "domain", "answers", pct=False, height=max(120, 28 * len(sub)))
+
+    section("Brand mentioned but your site not cited", "prompts where a third-party page carries the narrative")
+    rows = []
+    for r in records:
+        if r.extraction.target_mentioned and not r.extraction.target_cited and r.extraction.cited_domains:
+            rows.append({"prompt": r.prompt.text, "provider": r.response.provider, "sources cited": ", ".join(r.extraction.cited_domains), "id": short_pid(r.prompt.id)})
+    if rows:
+        df_table(pd.DataFrame(rows), column_config={"prompt": st.column_config.TextColumn(width="large")})
+    else:
+        empty_state("No such answers", "Whenever the brand was mentioned with sources, your site was among them.")
+
+    with st.expander("All cited URLs"):
+        urls = [{"url": u, "title": v["titles"].get(u, ""), "domain": d, "type": owner(d), "cited": n} for d, v in dom.items() for u, n in v["urls"].items()]
+        df_table(pd.DataFrame(urls).sort_values("cited", ascending=False), column_config={"url": st.column_config.LinkColumn("URL")})
+        if ws.is_demo:
+            st.caption("Demo workspace: all domains and URLs are fictional and do not resolve.")

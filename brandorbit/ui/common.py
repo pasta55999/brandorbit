@@ -1,8 +1,11 @@
-"""Shared UI helpers: repository access, styling, selectors and small components."""
+"""Shared UI building blocks: repo access, header/sidebar, KPI cards, sections, charts, evidence."""
 
 from __future__ import annotations
 
-from typing import Optional
+import html
+import re
+from pathlib import Path
+from typing import Callable, Optional
 
 import altair as alt
 import pandas as pd
@@ -13,61 +16,20 @@ from brandorbit.core.metrics import MetricValue, RunMetrics, compute_run_metrics
 from brandorbit.core.schemas import MonitoringRun, SourceKind, Workspace
 from brandorbit.monitoring.demo_loader import DEMO_WORKSPACE_ID, ensure_demo_workspace
 from brandorbit.storage.repository import Repository
+from brandorbit.ui.theme import ACCENT, BRAND_SERIES, CSS, LOGO_SVG, MUTED, SENTIMENT_COLORS
 
-NAVY = "#0F1D3A"
-ACCENT = "#2F80ED"
-ACCENT_2 = "#F2994A"
-MUTED = "#6B7280"
-PALETTE = ["#2F80ED", "#0F1D3A", "#F2994A", "#27AE60", "#9B51E0", "#EB5757", "#56CCF2"]
-
-CSS = f"""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-html, body, [class*="css"] {{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
-.block-container {{ padding-top: 1.6rem; padding-bottom: 3rem; max-width: 1280px; }}
-section[data-testid="stSidebar"] {{ background: {NAVY}; }}
-section[data-testid="stSidebar"] * {{ color: #E5E9F2 !important; }}
-section[data-testid="stSidebar"] a[aria-current="page"] {{ background: rgba(47,128,237,0.25) !important; border-radius: 8px; }}
-section[data-testid="stSidebar"] a:hover {{ background: rgba(255,255,255,0.06) !important; border-radius: 8px; }}
-section[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] > div {{ background: #1B2B4F; border-color: #2B3D63; }}
-.bo-brand {{ display:flex; align-items:center; gap:10px; padding: 4px 0 14px 0; }}
-.bo-brand h1 {{ font-size: 1.25rem; margin: 0; color: #fff !important; letter-spacing: .2px; }}
-.bo-brand small {{ color: #A9B4CC !important; font-size: .72rem; display:block; }}
-.bo-badge {{ display:inline-block; padding: 3px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; letter-spacing: .3px; }}
-.bo-badge.demo {{ background: #FFF4E5; color: #9A5B00; border: 1px solid #F5C77E; }}
-.bo-badge.live {{ background: #E6F6EC; color: #1E7A3B; border: 1px solid #9ED8B2; }}
-.bo-badge.sev-high {{ background:#FDE8E8; color:#B42318; }}
-.bo-badge.sev-medium {{ background:#FFF4E5; color:#9A5B00; }}
-.bo-badge.sev-low {{ background:#EEF2FF; color:#3730A3; }}
-.bo-card {{ background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px 18px; height: 100%; }}
-.bo-card .label {{ color: {MUTED}; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }}
-.bo-card .value {{ color: {NAVY}; font-size: 1.9rem; font-weight: 700; line-height: 1.15; margin-top: 4px; }}
-.bo-card .sub {{ color: {MUTED}; font-size: .78rem; margin-top: 4px; }}
-.bo-card .delta-up {{ color: #1E7A3B; font-weight: 600; }}
-.bo-card .delta-down {{ color: #B42318; font-weight: 600; }}
-.bo-note {{ background: #F8FAFC; border-left: 3px solid {ACCENT}; padding: 10px 14px; border-radius: 6px; color: #334155; font-size: .86rem; }}
-.bo-quote {{ border-left: 3px solid #CBD5E1; padding: 6px 12px; color: #334155; font-style: italic; background:#FAFAFA; border-radius: 4px; margin: 4px 0 8px 0; }}
-.bo-demo-banner {{ background: #FFF8EC; border: 1px solid #F5C77E; border-radius: 10px; padding: 10px 14px; font-size: .86rem; color: #7A4B00; margin-bottom: 14px; }}
-h1, h2, h3 {{ color: {NAVY}; }}
-h1 {{ font-weight: 700; letter-spacing: -.3px; }}
-[data-testid="stMetricValue"] {{ color: {NAVY}; }}
-</style>
-"""
-
-ORBIT_SVG = """
-<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="BrandOrbit logo">
-<circle cx="17" cy="17" r="15" stroke="#2F80ED" stroke-width="1.5" stroke-dasharray="3 3" opacity=".9"/>
-<ellipse cx="17" cy="17" rx="15" ry="6.5" stroke="#F2994A" stroke-width="1.4" transform="rotate(-25 17 17)"/>
-<circle cx="17" cy="17" r="4.2" fill="#FFFFFF"/>
-<circle cx="29.5" cy="11" r="2.1" fill="#F2994A"/>
-</svg>
-"""
+DEMO_EXPLAINER = (
+    "**Demo mode.** No API key is configured, so this workspace replays hand-written fixture answers for a "
+    "fictional brand. They imitate the *style* of AI shopping answers and are not outputs of any real AI system. "
+    "Every metric is still computed from the stored data by the real pipeline.\n\n"
+    "To monitor live providers, copy `.env.example` to `.env`, add `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`, and restart."
+)
 
 
+# ------------------------------------------------------------------ plumbing
 @st.cache_resource(show_spinner=False)
 def get_repo() -> Repository:
-    settings = get_settings()
-    repo = Repository(settings.db_path)
+    repo = Repository(get_settings().db_path)
     ensure_demo_workspace(repo)
     return repo
 
@@ -80,15 +42,31 @@ def inject_css() -> None:
     st.markdown(CSS, unsafe_allow_html=True)
 
 
+def esc(s: object) -> str:
+    return html.escape(str(s))
+
+
+# ------------------------------------------------------------------- sidebar
+LOGO_PATH = str(Path(__file__).with_name("assets") / "logo.svg")
+
+
 def sidebar_header() -> None:
-    st.sidebar.markdown(f'<div class="bo-brand">{ORBIT_SVG}<div><h1>BrandOrbit</h1><small>See how AI sees your brand</small></div></div>', unsafe_allow_html=True)
+    """Wordmark above the navigation (st.logo renders in the sidebar header slot)."""
+    try:
+        st.logo(LOGO_PATH, size="large", link=None)
+    except Exception:  # pragma: no cover - AppTest or very old Streamlit
+        st.sidebar.markdown(f'<div class="bo-wordmark">{LOGO_SVG}<div><span class="name">BrandOrbit</span><span class="tag">AI brand intelligence</span></div></div>', unsafe_allow_html=True)
 
 
-def mode_badge() -> str:
+def sidebar_footer() -> None:
     s = settings()
+    st.sidebar.markdown("---")
     if s.demo_mode:
-        return '<span class="bo-badge demo">DEMO MODE - fixture data</span>'
-    return f'<span class="bo-badge live">LIVE: {", ".join(s.live_providers)}</span>'
+        with st.sidebar.popover("Demo mode - what does this mean?", use_container_width=True, icon=":material/science:"):
+            st.markdown(DEMO_EXPLAINER)
+    else:
+        st.sidebar.markdown(f'<span class="bo-chip live">Live - {", ".join(s.live_providers)}</span>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="bo-note" style="padding-top:8px">Results reflect specific providers, prompts and times - not all consumer AI search experiences.</div>', unsafe_allow_html=True)
 
 
 def select_workspace(repo: Repository) -> Workspace:
@@ -97,89 +75,205 @@ def select_workspace(repo: Repository) -> Workspace:
     current = st.session_state.get("workspace_id", DEMO_WORKSPACE_ID)
     if current not in ids:
         current = ids[0]
-    choice = st.sidebar.selectbox("Workspace", ids, index=ids.index(current), format_func=lambda i: next(w.name for w in wss if w.id == i), key="workspace_select")
+    st.sidebar.markdown('<div class="bo-note" style="padding:6px 0 2px 2px;text-transform:uppercase;letter-spacing:.08em;font-size:.66rem;font-weight:600">Workspace</div>', unsafe_allow_html=True)
+    choice = st.sidebar.selectbox("Workspace", ids, index=ids.index(current), format_func=lambda i: next(w.name for w in wss if w.id == i), key="workspace_select", label_visibility="collapsed", help="Workspace")
     st.session_state["workspace_id"] = choice
     return repo.get_workspace(choice)
 
 
-def select_run(repo: Repository, ws: Workspace, label: str = "Monitoring run", key: str = "run_select", default_latest: bool = True) -> Optional[MonitoringRun]:
-    runs = repo.list_runs(ws.id)
-    if not runs:
-        return None
-    runs = list(reversed(runs))
-    idx = 0 if default_latest else len(runs) - 1
-    fmt = lambda r: f"{r.label}{'  (baseline)' if r.is_baseline else ''}{'  [partial]' if r.status == 'partial' else ''}"  # noqa: E731
-    return st.sidebar.selectbox(label, runs, index=idx, format_func=fmt, key=key)
+# -------------------------------------------------------------------- header
+def run_label(r: MonitoringRun) -> str:
+    flags = []
+    if r.is_baseline:
+        flags.append("baseline")
+    if r.status == "partial":
+        flags.append("partial")
+    label = re.sub(r"\s*\(simulated.*?\)", "", r.label).strip()
+    return f"{r.started_at:%d %b %Y} - {label}" + (f" ({', '.join(flags)})" if flags else "")
+
+
+def page_header(title: str, subtitle: str = "", *, repo: Optional[Repository] = None, ws: Optional[Workspace] = None, with_run: bool = False, key: str = "run_select") -> Optional[MonitoringRun]:
+    """Title row with an optional monitoring-period selector on the right. Returns the selected run."""
+    left, right = st.columns([5, 2.2], vertical_alignment="bottom")
+    with left:
+        st.markdown(f"## {title}")
+        if subtitle:
+            st.markdown(f'<div class="bo-sub">{esc(subtitle)}</div>', unsafe_allow_html=True)
+    run = None
+    if with_run and repo and ws:
+        runs = list(reversed(repo.list_runs(ws.id)))
+        with right:
+            if runs:
+                run = st.selectbox("Monitoring run", runs, index=0, format_func=run_label, key=key, label_visibility="collapsed")
+    st.write("")
+    return run
 
 
 def run_metrics(repo: Repository, ws: Workspace, run: MonitoringRun) -> RunMetrics:
     return compute_run_metrics(ws, repo.list_prompts(ws.id), repo.list_responses(run.id), repo.list_extractions(run.id))
 
 
-def demo_banner(ws: Workspace, run: Optional[MonitoringRun] = None) -> None:
-    if ws.is_demo or (run and run.mode == SourceKind.demo_fixture):
-        st.markdown(
-            '<div class="bo-demo-banner"><b>Demo data.</b> This workspace uses hand-written, clearly labelled fixture answers for a fictional brand. '
-            "They simulate the <i>style</i> of AI shopping answers and are not outputs of any real AI system. Configure an API key in <code>.env</code> to monitor live providers.</div>",
-            unsafe_allow_html=True,
-        )
+def previous_run(repo: Repository, ws: Workspace, run: MonitoringRun) -> Optional[MonitoringRun]:
+    runs = repo.list_runs(ws.id)
+    idx = [r.id for r in runs].index(run.id)
+    return runs[idx - 1] if idx > 0 else None
 
 
-def page_header(title: str, subtitle: str = "") -> None:
-    c1, c2 = st.columns([5, 2])
-    with c1:
-        st.markdown(f"## {title}")
-        if subtitle:
-            st.caption(subtitle)
-    with c2:
-        st.markdown(f'<div style="text-align:right;padding-top:14px">{mode_badge()}</div>', unsafe_allow_html=True)
-
-
-def metric_card(label: str, value: str, sub: str = "", delta: Optional[float] = None, help_text: str = "") -> None:
-    delta_html = ""
-    if delta is not None:
-        cls = "delta-up" if delta > 0 else ("delta-down" if delta < 0 else "")
-        delta_html = f' <span class="{cls}">{delta:+.1f} pts</span>'
-    title_attr = f' title="{help_text}"' if help_text else ""
-    st.markdown(f'<div class="bo-card"{title_attr}><div class="label">{label}</div><div class="value">{value}{delta_html}</div><div class="sub">{sub}</div></div>', unsafe_allow_html=True)
-
-
-def metric_sub(m: MetricValue) -> str:
-    return f"n = {m.sample} - {m.definition}"
-
-
-def severity_badge(sev: str) -> str:
-    return f'<span class="bo-badge sev-{sev}">{sev.upper()}</span>'
-
-
-def quote(text: str) -> None:
-    if text:
-        st.markdown(f'<div class="bo-quote">"{text}"</div>', unsafe_allow_html=True)
-
-
-def bar_chart(df: pd.DataFrame, x: str, y: str, color: Optional[str] = None, title: str = "", horizontal: bool = True, pct: bool = True, height: int = 260):
-    if df.empty:
-        st.info("No data for this chart yet.")
-        return
-    enc_val = alt.Y if not horizontal else alt.X
-    enc_cat = alt.X if not horizontal else alt.Y
-    axis = alt.Axis(format=".0f", title=("%" if pct else None))
-    chart = alt.Chart(df).mark_bar(cornerRadiusEnd=3).encode(
-        enc_val(f"{y}:Q", axis=axis, scale=alt.Scale(domain=[0, 100]) if pct else alt.Undefined),
-        enc_cat(f"{x}:N", sort="-x" if horizontal else None, title=None),
-        color=alt.Color(f"{color}:N", scale=alt.Scale(range=PALETTE), legend=alt.Legend(orient="bottom", title=None)) if color else alt.value(ACCENT),
-        tooltip=list(df.columns),
-    ).properties(height=height, title=title)
-    st.altair_chart(chart, use_container_width=True)
-
-
-def coverage_caption(m: RunMetrics) -> None:
+def coverage_line(m: RunMetrics, prev_label: Optional[str] = None) -> None:
     cov = m.coverage
-    txt = f"Coverage: {cov.eligible} eligible answers from {cov.prompts} prompts x {len(cov.providers)} provider(s)"
+    bits = [f"{cov.eligible} answers", f"{cov.prompts} prompts", f"{len(cov.providers)} provider{'s' if len(cov.providers) != 1 else ''}"]
     if cov.failed:
-        txt += f"; {cov.failed} failed/malformed answers excluded ({', '.join(f'{k}: {v}' for k, v in cov.by_status.items() if k != 'ok')})"
-    st.caption(txt + ". Results reflect the specific providers, prompts and time of this run; they do not represent all consumer AI search experiences.")
+        bits.append(f"{cov.failed} failed and excluded")
+    if prev_label:
+        bits.append(f"changes vs {prev_label}")
+    st.markdown(f'<div class="bo-note">{esc(" - ".join(bits))}</div>', unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------- components
+def chip(text: str, kind: str = "neutral") -> str:
+    return f'<span class="bo-chip {kind}">{esc(text)}</span>'
+
+
+def delta_html(delta: Optional[float], suffix: str = " pts", *, lower_is_better: bool = False, decimals: int = 1) -> str:
+    """Arrow shows the real direction; colour shows whether the change is good."""
+    if delta is None:
+        return ""
+    if abs(delta) < 0.05:
+        return '<span class="flat">no change</span>'
+    good = (delta < 0) if lower_is_better else (delta > 0)
+    arrow = "&#9650;" if delta > 0 else "&#9660;"
+    return f'<span class="{"up" if good else "down"}">{arrow} {abs(delta):.{decimals}f}{suffix}</span>'
+
+
+def kpi(label: str, value: str, *, help_text: str = "", sample: str = "", delta: Optional[float] = None, delta_suffix: str = " pts", invert: bool = False) -> None:
+    d = delta_html(delta, "" if invert else delta_suffix, lower_is_better=invert, decimals=0 if invert else 1)
+    meta = " ".join(x for x in [d, f"<span>n = {esc(sample)}</span>" if sample else ""] if x)
+    helper = f'<span class="help" title="{esc(help_text)}">?</span>' if help_text else ""
+    st.markdown(f'<div class="bo-kpi"><div class="label"><span>{esc(label)}</span>{helper}</div><div class="value">{esc(value)}</div><div class="meta">{meta}</div></div>', unsafe_allow_html=True)
+
+
+def metric_kpi(label: str, m: MetricValue, prev: Optional[MetricValue] = None, help_text: str = "") -> None:
+    delta = None if (prev is None or m.value is None or prev.value is None) else round(m.value - prev.value, 1)
+    kpi(label, m.display, help_text=help_text or m.definition, sample=m.sample, delta=delta)
+
+
+def section(title: str, side: str = "") -> None:
+    st.markdown(f'<div class="bo-sec"><span class="t">{esc(title)}</span><span class="s">{esc(side)}</span></div>', unsafe_allow_html=True)
+
+
+def empty_state(title: str, body: str = "") -> None:
+    st.markdown(f'<div class="bo-empty"><b>{esc(title)}</b>{esc(body)}</div>', unsafe_allow_html=True)
+
+
+def plain(text: str, limit: int = 320) -> str:
+    """Flatten markdown-ish answer text to one line for quoting (no bold markers, bullets or line breaks)."""
+    t = re.sub(r"[*_`#>]+", "", text)
+    t = re.sub(r"^\s*(?:\d+[.)]|-)\s+", "", t, flags=re.M)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t if len(t) <= limit else t[: limit - 1].rstrip() + "..."
+
+
+def quote(text: str, source: str = "") -> None:
+    if not text:
+        return
+    src = f'<span class="src">{esc(source)}</span>' if source else ""
+    st.markdown(f'<div class="bo-quote">"{esc(plain(text))}"{src}</div>', unsafe_allow_html=True)
+
+
+def raw_block(title: str, text: str) -> None:
+    body = esc(text).replace("\n", "<br>") if text else "<i>empty</i>"
+    st.markdown(f'<div class="bo-raw"><div class="hd">{esc(title)}</div>{body}</div>', unsafe_allow_html=True)
+
+
+def insight_card(kicker: str, title: str, body: str) -> None:
+    st.markdown(f'<div class="bo-insight"><div class="k">{esc(kicker)}</div><div class="t">{esc(title)}</div><div class="b">{esc(body)}</div></div>', unsafe_allow_html=True)
+
+
+def numbered_list(items: list[tuple[str, str]]) -> None:
+    rows = "".join(f'<div class="row"><span class="n">{i}</span><div><div class="t">{esc(t)}</div><div class="d">{esc(d)}</div></div></div>' for i, (t, d) in enumerate(items, 1))
+    st.markdown(f'<div class="bo-list">{rows}</div>', unsafe_allow_html=True)
 
 
 def short_pid(pid: str) -> str:
     return pid.split(":")[-1]
+
+
+def source_tag(kind: SourceKind) -> str:
+    return chip("Demo fixture", "demo") if kind == SourceKind.demo_fixture else chip("Live", "live")
+
+
+# -------------------------------------------------------------------- charts
+def chart(c: alt.Chart) -> None:
+    st.altair_chart(c, use_container_width=True, theme=None)
+
+
+def hbar(df: pd.DataFrame, cat: str, val: str, *, color: Optional[str] = None, domain: Optional[list[str]] = None, pct: bool = True, height: int = 200, tooltip: Optional[list] = None, sort: Optional[list] = None) -> None:
+    if df.empty:
+        empty_state("No data for this view")
+        return
+    x = alt.X(f"{val}:Q", title=None, axis=alt.Axis(format="d", labelExpr="datum.value + '%'") if pct else alt.Axis(format="d"), scale=alt.Scale(domain=[0, 100]) if pct else alt.Undefined)
+    enc = dict(x=x, y=alt.Y(f"{cat}:N", title=None, sort=sort or "-x"), tooltip=tooltip or list(df.columns))
+    if color:
+        enc["color"] = alt.Color(f"{color}:N", scale=alt.Scale(domain=domain, range=BRAND_SERIES) if domain else alt.Undefined, legend=None)
+    else:
+        enc["color"] = alt.value(ACCENT)
+    chart(alt.Chart(df).mark_bar(size=16).encode(**enc).properties(height=height))
+
+
+def grouped_bar(df: pd.DataFrame, group: str, val: str, series: str, domain: list[str], *, height: int = 220, pct: bool = True) -> None:
+    if df.empty:
+        empty_state("No data for this view")
+        return
+    groups = list(dict.fromkeys(df[group].tolist()))
+    c = alt.Chart(df).mark_bar(size=9).encode(
+        y=alt.Y(f"{group}:N", title=None, sort=groups, axis=alt.Axis(labelPadding=8)),
+        yOffset=alt.YOffset(f"{series}:N", sort=domain),
+        x=alt.X(f"{val}:Q", title=None, scale=alt.Scale(domain=[0, 100]) if pct else alt.Undefined, axis=alt.Axis(labelExpr="datum.value + '%'") if pct else alt.Axis()),
+        color=alt.Color(f"{series}:N", scale=alt.Scale(domain=domain, range=BRAND_SERIES), legend=alt.Legend(orient="bottom", columns=4)),
+        tooltip=list(df.columns),
+    ).properties(height=max(height, (12 * len(domain) + 16) * len(groups)))
+    chart(c)
+
+
+def trend(df: pd.DataFrame, x: str, y: str, series: str, *, height: int = 240, colors: Optional[list[str]] = None) -> None:
+    order = list(dict.fromkeys(df[x].tolist()))  # keep chronological order of the data
+    c = alt.Chart(df).mark_line(point=True).encode(
+        x=alt.X(f"{x}:O", title=None, sort=order, axis=alt.Axis(labelAngle=0)),
+        y=alt.Y(f"{y}:Q", title=None, scale=alt.Scale(domain=[0, 100]), axis=alt.Axis(labelExpr="datum.value + '%'")),
+        color=alt.Color(f"{series}:N", scale=alt.Scale(range=colors or BRAND_SERIES), legend=alt.Legend(orient="bottom")),
+        tooltip=list(df.columns),
+    ).properties(height=height)
+    chart(c)
+
+
+def sentiment_bar(counts: dict[str, int], height: int = 56) -> None:
+    total = sum(counts.values())
+    if not total:
+        empty_state("No brand mentions to classify")
+        return
+    order = ["positive", "neutral", "uncertain", "negative"]
+    df = pd.DataFrame([{"sentiment": k, "count": v, "share": round(100 * v / total, 1), "rank": order.index(k)} for k, v in counts.items() if v])
+    c = alt.Chart(df).mark_bar(size=22).encode(
+        x=alt.X("sum(share):Q", stack="normalize", axis=None),
+        color=alt.Color("sentiment:N", scale=alt.Scale(domain=order, range=[SENTIMENT_COLORS[o] for o in order]), legend=alt.Legend(orient="bottom")),
+        order=alt.Order("rank:Q"),
+        tooltip=["sentiment", "count", "share"],
+    ).properties(height=height)
+    chart(c)
+
+
+def df_table(df: pd.DataFrame, **kwargs) -> None:
+    st.dataframe(df, use_container_width=True, hide_index=True, **kwargs)
+
+
+def pct_col(label: str, **kw):
+    return st.column_config.ProgressColumn(label, format="%.0f%%", min_value=0, max_value=100, **kw)
+
+
+def guard_run(repo: Repository, ws: Workspace, run: Optional[MonitoringRun], render_if_missing: Optional[Callable] = None) -> bool:
+    if run is not None:
+        return True
+    empty_state("No monitoring runs yet", "Open Monitoring to approve prompts and start a run. Demo providers work without an API key.")
+    if render_if_missing:
+        render_if_missing()
+    return False

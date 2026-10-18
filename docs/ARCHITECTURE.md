@@ -3,9 +3,10 @@
 ```
                  +-------------------------------------------------------------+
                  |                    Streamlit UI (brandorbit/ui)              |
-                 |  Overview | Visibility | Competitors | Perception | Citations|
-                 |  Prompt explorer | Recommendations | Audit | Before&after    |
-                 |  Settings (brand, catalogue, prompts, run, providers)        |
+                 |  Overview | AI Visibility | Competitors | Brand Perception  |
+                 |  Sources & Citations | Recommendations (actions, product    |
+                 |  data) | Monitoring (runs, before/after, prompt explorer)  |
+                 |  Settings (brand, catalogue, prompts, providers, data)      |
                  +------------------------------+------------------------------+
                                                 |
         +----------------------+----------------+----------------+----------------------+
